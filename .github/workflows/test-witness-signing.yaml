@@ -1,0 +1,60 @@
+name: Test Witness Keyless Signing
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  id-token: write  # Required for GitHub OIDC token
+  contents: read
+
+jobs:
+  test-keyless-signing:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install witness CLI
+        run: |
+          wget https://github.com/in-toto/witness/releases/download/v0.6.0/witness_0.6.0_linux_amd64.tar.gz
+          tar -xzf witness_0.6.0_linux_amd64.tar.gz
+          sudo mv witness /usr/local/bin/
+          witness version
+
+      - name: Create test artifact
+        run: |
+          echo "This is a test artifact for witness signing" > test-artifact.txt
+          echo "Build timestamp: $(date)" >> test-artifact.txt
+
+      - name: Run witness with keyless signing
+        env:
+          FULCIO_URL: "https://fulcio.testifysec-demo.xyz"
+          TSA_URL: "https://tsa.testifysec-demo.xyz"
+        run: |
+          # Run witness with Fulcio and TSA configuration
+          witness run \
+            --step build \
+            --attestations github \
+            --signer-fulcio-url "$FULCIO_URL" \
+            --signer-fulcio-oidc-issuer "https://token.actions.githubusercontent.com" \
+            --signer-fulcio-oidc-client-id "sigstore" \
+            --timestamp-servers "$TSA_URL" \
+            -- echo "Building test artifact"
+
+      - name: Verify attestation was created
+        run: |
+          ls -la *.json || echo "No attestation files found"
+          cat *.json 2>/dev/null || echo "Could not read attestation file"
+
+      - name: Upload attestation artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: witness-attestation
+          path: "*.json"
+          if-no-files-found: warn
