@@ -35,10 +35,13 @@ jobs:
         env:
           FULCIO_URL: "https://fulcio.testifysec-demo.xyz"
           TSA_URL: "https://tsa.testifysec-demo.xyz/api/v1/timestamp"
+          ARCHIVISTA_SERVER: "https://judge.testifysec-demo.xyz"
+          ARCHIVISTA_TOKEN: ${{ secrets.ARCHIVISTA_TOKEN }}
         run: |
-          # Run witness with Fulcio and TSA configuration
-          # Note: Witness uses gRPC (port 5554) to communicate with Fulcio
-          # TSA uses HTTP REST at /api/v1/timestamp endpoint
+          # Run witness with Fulcio, TSA, and Archivista configuration
+          # - Fulcio: gRPC (port 5554) for keyless certificate signing
+          # - TSA: HTTP REST at /api/v1/timestamp for RFC 3161 timestamps
+          # - Archivista: HTTP REST for attestation storage
           witness run \
             --step build \
             --attestations github \
@@ -46,6 +49,8 @@ jobs:
             --signer-fulcio-oidc-issuer "https://token.actions.githubusercontent.com" \
             --signer-fulcio-oidc-client-id "sigstore" \
             --timestamp-servers "$TSA_URL" \
+            --archivista-server "$ARCHIVISTA_SERVER" \
+            --archivista-token "$ARCHIVISTA_TOKEN" \
             -- echo "Building test artifact"
 
       - name: Verify attestation was created
