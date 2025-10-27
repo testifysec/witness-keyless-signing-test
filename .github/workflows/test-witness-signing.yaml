@@ -21,8 +21,8 @@ jobs:
 
       - name: Install witness CLI
         run: |
-          wget https://github.com/in-toto/witness/releases/download/v0.6.0/witness_0.6.0_linux_amd64.tar.gz
-          tar -xzf witness_0.6.0_linux_amd64.tar.gz
+          wget https://github.com/in-toto/witness/releases/download/v0.10.1/witness_0.10.1_linux_amd64.tar.gz
+          tar -xzf witness_0.10.1_linux_amd64.tar.gz
           sudo mv witness /usr/local/bin/
           witness version
 
