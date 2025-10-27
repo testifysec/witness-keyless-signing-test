@@ -34,10 +34,11 @@ jobs:
       - name: Run witness with keyless signing
         env:
           FULCIO_URL: "https://fulcio.testifysec-demo.xyz"
-          TSA_URL: "https://tsa.testifysec-demo.xyz"
+          TSA_URL: "https://tsa.testifysec-demo.xyz/api/v1/timestamp"
         run: |
           # Run witness with Fulcio and TSA configuration
-          # Note: Witness uses gRPC, not HTTP REST, to communicate with Fulcio
+          # Note: Witness uses gRPC (port 5554) to communicate with Fulcio
+          # TSA uses HTTP REST at /api/v1/timestamp endpoint
           witness run \
             --step build \
             --attestations github \
