@@ -33,10 +33,11 @@ jobs:
 
       - name: Run witness with keyless signing
         env:
-          FULCIO_URL: "https://fulcio.testifysec-demo.xyz/api/v2"
+          FULCIO_URL: "https://fulcio.testifysec-demo.xyz"
           TSA_URL: "https://tsa.testifysec-demo.xyz"
         run: |
           # Run witness with Fulcio and TSA configuration
+          # Note: Witness uses gRPC, not HTTP REST, to communicate with Fulcio
           witness run \
             --step build \
             --attestations github \
