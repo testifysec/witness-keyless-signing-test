@@ -49,8 +49,9 @@ jobs:
             --signer-fulcio-oidc-issuer "https://token.actions.githubusercontent.com" \
             --signer-fulcio-oidc-client-id "sigstore" \
             --timestamp-servers "$TSA_URL" \
+            --enable-archivista \
             --archivista-server "$ARCHIVISTA_SERVER" \
-            --archivista-token "$ARCHIVISTA_TOKEN" \
+            --archivista-headers "Authorization: Token $ARCHIVISTA_TOKEN" \
             -- echo "Building test artifact"
 
       - name: Verify attestation was created
